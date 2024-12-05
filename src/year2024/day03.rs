@@ -1,6 +1,14 @@
 use regex::Regex;
 use std::fs;
 
+pub struct Day03;
+
+impl Day for Day03 {
+    fn title(&self) -> &str {
+        "Mull It Over"
+    }
+}
+
 enum Command {
     Do,
     Dont,

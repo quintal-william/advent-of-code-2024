@@ -1,5 +1,15 @@
 use std::fs;
 
+// use crate::solution::Day;
+
+pub struct Day02;
+
+// impl Day for Day02 {
+//     fn title(&self) -> &str {
+//         "Red-Nosed Reports"
+//     }
+// }
+
 type Report = Vec<i32>;
 
 enum Trend {
