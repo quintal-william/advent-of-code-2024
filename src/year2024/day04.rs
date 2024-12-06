@@ -4,7 +4,7 @@ pub struct Day04;
 
 pub struct Day04Context {
     grid: Vec<Vec<char>>,
-    size: i32,
+    size: usize,
 }
 
 impl Day for Day04 {
@@ -29,7 +29,7 @@ impl Day for Day04 {
         let lines: Vec<&str> = input.lines().collect();
         Day04Context {
             grid: lines.iter().map(|line| line.chars().collect()).collect(),
-            size: lines.len() as i32,
+            size: lines.len(),
         }
     }
 
@@ -40,76 +40,76 @@ impl Day for Day04 {
             for y in 0..context.size {
                 let mut words: Vec<String> = vec![];
 
-                if x + 3 < context.size {
+                if x < context.size - 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[y as usize][(x + 1) as usize],
-                        context.grid[y as usize][(x + 2) as usize],
-                        context.grid[y as usize][(x + 3) as usize]
+                        context.grid[y][x],
+                        context.grid[y][x + 1],
+                        context.grid[y][x + 2],
+                        context.grid[y][x + 3]
                     ));
                 }
-                if y + 3 < context.size && x + 3 < context.size {
+                if y < context.size - 3 && x < context.size - 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[(y + 1) as usize][(x + 1) as usize],
-                        context.grid[(y + 2) as usize][(x + 2) as usize],
-                        context.grid[(y + 3) as usize][(x + 3) as usize]
+                        context.grid[y][x],
+                        context.grid[y + 1][x + 1],
+                        context.grid[y + 2][x + 2],
+                        context.grid[y + 3][x + 3]
                     ));
                 }
-                if y + 3 < context.size {
+                if y < context.size - 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[(y + 1) as usize][x as usize],
-                        context.grid[(y + 2) as usize][x as usize],
-                        context.grid[(y + 3) as usize][x as usize]
+                        context.grid[y][x],
+                        context.grid[y + 1][x],
+                        context.grid[y + 2][x],
+                        context.grid[y + 3][x]
                     ));
                 }
-                if y + 3 < context.size && x - 3 >= 0 {
+                if y < context.size - 3 && x >= 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[(y + 1) as usize][(x - 1) as usize],
-                        context.grid[(y + 2) as usize][(x - 2) as usize],
-                        context.grid[(y + 3) as usize][(x - 3) as usize]
+                        context.grid[y][x],
+                        context.grid[y + 1][x - 1],
+                        context.grid[y + 2][x - 2],
+                        context.grid[y + 3][x - 3]
                     ));
                 }
-                if x - 3 >= 0 {
+                if x >= 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[y as usize][(x - 1) as usize],
-                        context.grid[y as usize][(x - 2) as usize],
-                        context.grid[y as usize][(x - 3) as usize]
+                        context.grid[y][x],
+                        context.grid[y][x - 1],
+                        context.grid[y][x - 2],
+                        context.grid[y][x - 3]
                     ));
                 }
-                if y - 3 >= 0 && x - 3 >= 0 {
+                if y >= 3 && x >= 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[(y - 1) as usize][(x - 1) as usize],
-                        context.grid[(y - 2) as usize][(x - 2) as usize],
-                        context.grid[(y - 3) as usize][(x - 3) as usize]
+                        context.grid[y][x],
+                        context.grid[y - 1][x - 1],
+                        context.grid[y - 2][x - 2],
+                        context.grid[y - 3][x - 3]
                     ));
                 }
-                if y - 3 >= 0 {
+                if y >= 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[(y - 1) as usize][x as usize],
-                        context.grid[(y - 2) as usize][x as usize],
-                        context.grid[(y - 3) as usize][x as usize]
+                        context.grid[y][x],
+                        context.grid[y - 1][x],
+                        context.grid[y - 2][x],
+                        context.grid[y - 3][x]
                     ));
                 }
-                if y - 3 >= 0 && x + 3 < context.size {
+                if y >= 3 && x < context.size - 3 {
                     words.push(format!(
                         "{}{}{}{}",
-                        context.grid[y as usize][x as usize],
-                        context.grid[(y - 1) as usize][(x + 1) as usize],
-                        context.grid[(y - 2) as usize][(x + 2) as usize],
-                        context.grid[(y - 3) as usize][(x + 3) as usize]
+                        context.grid[y][x],
+                        context.grid[y - 1][x + 1],
+                        context.grid[y - 2][x + 2],
+                        context.grid[y - 3][x + 3]
                     ));
                 }
 
@@ -129,11 +129,11 @@ impl Day for Day04 {
 
                 let word = format!(
                     "{}{}{}{}{}",
-                    context.grid[y as usize][x as usize],
-                    context.grid[y as usize][(x + 2) as usize],
-                    context.grid[(y + 1) as usize][(x + 1) as usize],
-                    context.grid[(y + 2) as usize][x as usize],
-                    context.grid[(y + 2) as usize][(x + 2) as usize]
+                    context.grid[y][x],
+                    context.grid[y][x + 2],
+                    context.grid[y + 1][x + 1],
+                    context.grid[y + 2][x],
+                    context.grid[y + 2][x + 2]
                 );
                 score += if word == "MSAMS" || word == "SSAMM" || word == "MMASS" || word == "SMASM"
                 {
