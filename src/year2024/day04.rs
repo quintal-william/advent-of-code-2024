@@ -41,76 +41,68 @@ impl Day for Day04 {
                 let mut words: Vec<String> = vec![];
 
                 if x < context.size - 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y][x + 1],
                         context.grid[y][x + 2],
-                        context.grid[y][x + 3]
-                    ));
+                        context.grid[y][x + 3],
+                    ]));
                 }
                 if y < context.size - 3 && x < context.size - 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y + 1][x + 1],
                         context.grid[y + 2][x + 2],
-                        context.grid[y + 3][x + 3]
-                    ));
+                        context.grid[y + 3][x + 3],
+                    ]));
                 }
                 if y < context.size - 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y + 1][x],
                         context.grid[y + 2][x],
-                        context.grid[y + 3][x]
-                    ));
+                        context.grid[y + 3][x],
+                    ]));
                 }
                 if y < context.size - 3 && x >= 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y + 1][x - 1],
                         context.grid[y + 2][x - 2],
-                        context.grid[y + 3][x - 3]
-                    ));
+                        context.grid[y + 3][x - 3],
+                    ]));
                 }
                 if x >= 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y][x - 1],
                         context.grid[y][x - 2],
-                        context.grid[y][x - 3]
-                    ));
+                        context.grid[y][x - 3],
+                    ]));
                 }
                 if y >= 3 && x >= 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y - 1][x - 1],
                         context.grid[y - 2][x - 2],
-                        context.grid[y - 3][x - 3]
-                    ));
+                        context.grid[y - 3][x - 3],
+                    ]));
                 }
                 if y >= 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y - 1][x],
                         context.grid[y - 2][x],
-                        context.grid[y - 3][x]
-                    ));
+                        context.grid[y - 3][x],
+                    ]));
                 }
                 if y >= 3 && x < context.size - 3 {
-                    words.push(format!(
-                        "{}{}{}{}",
+                    words.push(String::from_iter(vec![
                         context.grid[y][x],
                         context.grid[y - 1][x + 1],
                         context.grid[y - 2][x + 2],
-                        context.grid[y - 3][x + 3]
-                    ));
+                        context.grid[y - 3][x + 3],
+                    ]));
                 }
 
                 score += words.iter().filter(|word| *word == "XMAS").count() as i32;
