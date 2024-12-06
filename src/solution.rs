@@ -97,6 +97,7 @@ pub trait Day {
     }
 
     fn solve(year: YearValue, day: DayValue) -> SolvedDay {
+        // TODO only solve the parts specified by the input_type
         let example_solutions = Self::solve_input_type(year, day, InputType::Example);
         let puzzle_solutions = Self::solve_input_type(year, day, InputType::Puzzle);
 
