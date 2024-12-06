@@ -112,4 +112,12 @@ pub trait Day {
 
 pub trait Year {
     fn solve_day(year: YearValue, day: DayValue) -> Option<SolvedDay>;
+
+    fn solve_all(year: YearValue) -> [Option<SolvedDay>; 25] {
+        let mut solutions_array: [Option<SolvedDay>; 25] = Default::default();
+        for day in 1..=25 {
+            solutions_array[day - 1] = Self::solve_day(year, day as DayValue);
+        }
+        return solutions_array;
+    }
 }
