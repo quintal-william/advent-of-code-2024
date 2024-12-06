@@ -1,14 +1,6 @@
-use std::fs;
-
-// use crate::solution::Day;
+use crate::solution::{Day, Solutions};
 
 pub struct Day02;
-
-// impl Day for Day02 {
-//     fn title(&self) -> &str {
-//         "Red-Nosed Reports"
-//     }
-// }
 
 type Report = Vec<i32>;
 
@@ -65,32 +57,46 @@ fn is_probe_safe_report(report: &Report) -> bool {
     return false;
 }
 
-fn main() {
-    // Parse
-    let path = "src/2024/day_02/in.txt";
-    let content: Vec<Report> = fs::read_to_string(path)
-        .expect(&format!("Expected input file at {path}"))
-        .lines()
-        .map(|line| {
-            line.split(' ')
-                .map(|num| num.parse().expect("Expected a number"))
-                .collect()
-        })
-        .collect();
+impl Day for Day02 {
+    type Context = Vec<Report>;
+    type Part1 = usize;
+    type Part2 = usize;
 
-    // Calculate
-    println!(
-        "Solution 1: {} (should be 379)",
-        content
+    fn title() -> String {
+        String::from("Red-Nosed Reports")
+    }
+
+    fn solutions() -> Solutions<Self::Part1, Self::Part2> {
+        Solutions {
+            part1_example: Some(2),
+            part1: Some(379),
+            part2_example: Some(4),
+            part2: Some(430),
+        }
+    }
+
+    fn create_context(input: &str) -> Self::Context {
+        input
+            .lines()
+            .map(|line| {
+                line.split(' ')
+                    .map(|num| num.parse().expect("Expected a number"))
+                    .collect()
+            })
+            .collect()
+    }
+
+    fn solve_part_1(context: &Self::Context) -> Self::Part1 {
+        context
             .iter()
             .filter(|report| is_safe_report(&report))
             .count()
-    );
-    println!(
-        "Solution 2: {} (should be 430)",
-        content
+    }
+
+    fn solve_part_2(context: &Self::Context) -> Self::Part2 {
+        context
             .iter()
             .filter(|report| is_probe_safe_report(&report))
             .count()
-    );
+    }
 }

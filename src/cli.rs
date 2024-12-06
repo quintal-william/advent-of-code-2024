@@ -1,10 +1,9 @@
-use std::fs;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use clap::{builder, value_parser, Parser, Subcommand};
+use cli_colors::Colorizer;
 
-use crate::solution::{Day, Year};
-
+use crate::solution::{Solution, Year};
 use crate::year2024::Year2024;
 
 pub type YearValue = u16;
@@ -53,38 +52,74 @@ enum Commands {
     },
 }
 
-fn run(year_value: YearValue, day_value: DayValue, example: bool) {
-    // Validate year and day
-    let year = match year_value {
-        2024 => Year2024,
-        _ => panic!("Year {year_value} not found."),
-    };
-    let day = year
-        .get_day(day_value)
-        .expect(&format!("Day {day_value} not found in year {year_value}."));
+fn report_run(
+    year: YearValue,
+    day: DayValue,
+    part1: Solution,
+    part2: Solution,
+    title: String,
+    duration: Duration,
+) {
+    let colorizer = Colorizer::new();
+    let error_icon = colorizer.bold(colorizer.bright_red("x"));
+    let success_icon = colorizer.bold(colorizer.bright_green("✓"));
+    let unknown_icon = colorizer.bold(colorizer.white("?"));
 
-    // Read input
-    let ext = if example { "example" } else { "in" };
-    let ref path = format!("src/year{year_value}/day{day_value:02}.{ext}");
-    let ref input = fs::read_to_string(path).expect(&format!("Expected input file at {path}"));
-
-    // Solve
-    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let ref context = day.create_context(input);
-    let part_1 = day.solve_part_1(context);
-    let part_2 = day.solve_part_2(context);
-    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let part_1_icon = part1.is_correct.map_or(&unknown_icon, |is_correct| {
+        if is_correct {
+            &success_icon
+        } else {
+            &error_icon
+        }
+    });
+    let part_2_icon = part2.is_correct.map_or(&unknown_icon, |is_correct| {
+        if is_correct {
+            &success_icon
+        } else {
+            &error_icon
+        }
+    });
 
     // Report
-    println!("AoC {year_value}-{day_value}: {}", day.title());
-    println!("Solution 1: {}", part_1);
-    println!("Solution 2: {}", part_2);
+    println!("AoC {year}-{day}: {}", title);
+    println!("{part_1_icon} Solution 1: {}", part1.value);
+    println!("{part_2_icon} Solution 2: {}", part2.value);
 
-    let duration = end - start;
     let secs = duration.as_secs();
     let millis = duration.subsec_millis();
     let micros = duration.subsec_micros() % 1_000;
     println!("Time: {}.{}{} seconds", secs, millis, micros);
+}
+
+fn run(year: YearValue, day: DayValue, example: bool) {
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let solutions = match year {
+        2024 => Year2024::solve_day(year, day),
+        _ => panic!("Year {year} not found."),
+    }
+    .expect(&format!("Day {day} not found for year {year}."));
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let duration = end - start;
+
+    if example {
+        report_run(
+            year,
+            day,
+            solutions.part1_example,
+            solutions.part2_example,
+            solutions.title,
+            duration,
+        );
+    } else {
+        report_run(
+            year,
+            day,
+            solutions.part1,
+            solutions.part2,
+            solutions.title,
+            duration,
+        );
+    };
 }
 
 fn all(_year: YearValue) {
