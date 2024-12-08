@@ -42,7 +42,7 @@ impl Day for Day01 {
         Day01Context { left, right }
     }
 
-    fn solve_part_1(context: &Self::Context) -> Self::Part1 {
+    fn solve_part1(context: &Self::Context) -> Self::Part1 {
         let mut score = 0;
         for (l, r) in context
             .left
@@ -55,7 +55,7 @@ impl Day for Day01 {
         return score;
     }
 
-    fn solve_part_2(context: &Self::Context) -> Self::Part2 {
+    fn solve_part2(context: &Self::Context) -> Self::Part2 {
         let mut occurrences = HashMap::new();
         for &num in &context.right {
             *occurrences.entry(num).or_insert(0) += 1;

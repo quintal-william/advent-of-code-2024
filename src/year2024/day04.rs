@@ -33,7 +33,7 @@ impl Day for Day04 {
         }
     }
 
-    fn solve_part_1(context: &Self::Context) -> Self::Part1 {
+    fn solve_part1(context: &Self::Context) -> Self::Part1 {
         let mut score = 0;
 
         for x in 0..context.size {
@@ -111,7 +111,7 @@ impl Day for Day04 {
         return score;
     }
 
-    fn solve_part_2(context: &Self::Context) -> Self::Part2 {
+    fn solve_part2(context: &Self::Context) -> Self::Part2 {
         let mut score = 0;
         for x in 0..context.size {
             for y in 0..context.size {

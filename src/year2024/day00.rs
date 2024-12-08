@@ -24,11 +24,11 @@ impl Day for Day00 {
         ()
     }
 
-    fn solve_part_1(context: &Self::Context) -> Self::Part1 {
+    fn solve_part1(context: &Self::Context) -> Self::Part1 {
         0
     }
 
-    fn solve_part_2(context: &Self::Context) -> Self::Part2 {
+    fn solve_part2(context: &Self::Context) -> Self::Part2 {
         0
     }
 }

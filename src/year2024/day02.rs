@@ -86,14 +86,14 @@ impl Day for Day02 {
             .collect()
     }
 
-    fn solve_part_1(context: &Self::Context) -> Self::Part1 {
+    fn solve_part1(context: &Self::Context) -> Self::Part1 {
         context
             .iter()
             .filter(|report| is_safe_report(&report))
             .count()
     }
 
-    fn solve_part_2(context: &Self::Context) -> Self::Part2 {
+    fn solve_part2(context: &Self::Context) -> Self::Part2 {
         context
             .iter()
             .filter(|report| is_probe_safe_report(&report))

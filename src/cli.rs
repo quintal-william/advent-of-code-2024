@@ -3,7 +3,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use clap::{builder, value_parser, Parser, Subcommand};
 use cli_colors::Colorizer;
 
-use crate::solution::Year;
+use crate::solution::{InputType, Year};
 use crate::year2024::Year2024;
 
 pub type YearValue = u16;
@@ -75,29 +75,32 @@ fn get_icon(is_correct: Option<bool>) -> String {
 }
 
 fn run(year: YearValue, day: DayValue, example: bool) {
+    let input_type = if example {
+        InputType::Example
+    } else {
+        InputType::Puzzle
+    };
+
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let solutions = match year {
-        2024 => Year2024::solve_day(year, day),
+    let day_output = match year {
+        2024 => Year2024::solve_day(year, day, input_type),
         _ => panic!("Year {year} not found."),
     }
     .expect(&format!("Day {day} not found for year {year}."));
     let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let duration = end - start;
 
-    let part1 = if example {
-        solutions.part1_example
-    } else {
-        solutions.part1
-    };
-    let part2 = if example {
-        solutions.part2_example
-    } else {
-        solutions.part2
-    };
-
-    println!("AoC {year}-{day}: {}", solutions.title);
-    println!("{} Solution 1: {}", get_icon(part1.is_correct), part1.value);
-    println!("{} Solution 2: {}", get_icon(part2.is_correct), part2.value);
+    println!("AoC {year}-{day}: {}", day_output.title);
+    println!(
+        "{} Solution 1: {}",
+        get_icon(day_output.part1.is_correct),
+        day_output.part1.value
+    );
+    println!(
+        "{} Solution 2: {}",
+        get_icon(day_output.part2.is_correct),
+        day_output.part2.value
+    );
     report_duration(duration);
 }
 
@@ -127,8 +130,8 @@ fn all(year: YearValue) {
                 let missing_icon = colorizer.bold(colorizer.white("-"));
                 print!("{missing_icon}{missing_icon}|")
             } else {
-                print!("{}", get_icon(s.as_ref().unwrap().part1_example.is_correct));
-                print!("{}", get_icon(s.as_ref().unwrap().part2_example.is_correct));
+                print!("{}", get_icon(s.as_ref().unwrap().0.part1.is_correct));
+                print!("{}", get_icon(s.as_ref().unwrap().0.part2.is_correct));
                 print!("|");
             }
         }
@@ -144,8 +147,8 @@ fn all(year: YearValue) {
                 let missing_icon = colorizer.bold(colorizer.white("-"));
                 print!("{missing_icon}{missing_icon}|")
             } else {
-                print!("{}", get_icon(s.as_ref().unwrap().part1.is_correct));
-                print!("{}", get_icon(s.as_ref().unwrap().part2.is_correct));
+                print!("{}", get_icon(s.as_ref().unwrap().1.part1.is_correct));
+                print!("{}", get_icon(s.as_ref().unwrap().1.part2.is_correct));
                 print!("|");
             }
         }
