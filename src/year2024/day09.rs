@@ -1,8 +1,8 @@
 use crate::solution::{Day, Solutions};
 
-pub struct Day00;
+pub struct Day09;
 
-impl Day for Day00 {
+impl Day for Day09 {
     type Context = ();
     type Part1 = i32;
     type Part2 = i32;

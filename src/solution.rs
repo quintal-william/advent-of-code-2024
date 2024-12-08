@@ -50,7 +50,6 @@ pub trait Day {
         let ref input = Self::get_input(year, day, &input_type);
         let ref context = Self::create_context(input);
         let solutions = Self::solutions();
-        // TODO is it part1 or part1?
         let part1 = Self::solve_part1(context);
         let part2 = Self::solve_part2(context);
 
