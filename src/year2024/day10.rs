@@ -2,21 +2,22 @@ use std::{collections::HashSet, vec};
 
 use crate::{
     dir::Dir,
+    grid::Grid,
     point::Point,
     solution::{Day, Solutions},
 };
 
 pub struct Day10;
 
-fn get_neighbors(p: Point<usize>, width: usize, height: usize) -> Vec<Point<usize>> {
+fn get_neighbors(p: Point<usize>, grid: &Grid<u8>) -> Vec<Point<usize>> {
     let mut points = vec![];
     if p.y > 0 {
         points.push(p.dir(&Dir::Up));
     }
-    if p.x < width - 1 {
+    if p.x < grid.width() - 1 {
         points.push(p.dir(&Dir::Right));
     }
-    if p.y < height - 1 {
+    if p.y < grid.height() - 1 {
         points.push(p.dir(&Dir::Down));
     }
     if p.x > 0 {
@@ -25,48 +26,34 @@ fn get_neighbors(p: Point<usize>, width: usize, height: usize) -> Vec<Point<usiz
     return points;
 }
 
-fn get_trail_score_2(p: Point<usize>, context: &Day10Context, level: u8) -> i32 {
-    if level == 9 {
-        return 1;
-    }
-
-    let mut score = 0;
-    for next in get_neighbors(p, context.width, context.height) {
-        if context.grid[next.y][next.x] == level + 1 {
-            score += get_trail_score_2(next, context, level + 1);
-        }
-    }
-    return score;
-}
-
-fn get_trail_score_1(
+fn get_trail_score(
     p: Point<usize>,
-    context: &Day10Context,
-    visited: &mut HashSet<Point<usize>>,
+    grid: &Grid<u8>,
     level: u8,
+    visited: &mut Option<HashSet<Point<usize>>>,
 ) -> i32 {
-    if visited.contains(&p) {
-        return 0;
+    if let Some(set) = visited {
+        if set.contains(&p) {
+            return 0;
+        }
+        set.insert(p);
     }
-    visited.insert(p);
 
     if level == 9 {
         return 1;
     }
 
     let mut score = 0;
-    for next in get_neighbors(p, context.width, context.height) {
-        if context.grid[next.y][next.x] == level + 1 {
-            score += get_trail_score_1(next, context, visited, level + 1);
+    for next in get_neighbors(p, grid) {
+        if *grid.get(&next) == level + 1 {
+            score += get_trail_score(next, grid, level + 1, visited);
         }
     }
     return score;
 }
 
 pub struct Day10Context {
-    grid: Vec<Vec<u8>>,
-    width: usize,
-    height: usize,
+    grid: Grid<u8>,
     trail_heads: Vec<Point<usize>>,
 }
 
@@ -89,35 +76,32 @@ impl Day for Day10 {
     }
 
     fn create_context(input: &str) -> Self::Context {
-        let grid: Vec<Vec<u8>> = input
-            .lines()
-            .map(|l| l.chars().map(|c| c.to_digit(10).unwrap() as u8).collect())
+        let content: Vec<u8> = input
+            .replace("\n", "")
+            .chars()
+            .map(|c| c.to_digit(10).unwrap() as u8)
             .collect();
-        let width = grid[0].len();
-        let height = grid.len();
+
+        let width = input.find('\n').unwrap();
+        let grid = Grid::from_vec(content, width);
 
         let mut trail_heads = vec![];
-        for y in 0..grid.len() {
-            for x in 0..grid[0].len() {
-                if grid[y][x] == 0 {
-                    trail_heads.push(Point::new(x, y));
+        for y in 0..grid.height() {
+            for x in 0..grid.width() {
+                let p = Point { x, y };
+                if *grid.get(&p) == 0 {
+                    trail_heads.push(p);
                 }
             }
         }
 
-        Day10Context {
-            grid,
-            width,
-            height,
-            trail_heads,
-        }
+        Day10Context { grid, trail_heads }
     }
 
     fn solve_part1(context: &Self::Context) -> Self::Part1 {
         let mut score = 0;
         for trail_head in &context.trail_heads {
-            let mut visited = HashSet::new();
-            score += get_trail_score_1(*trail_head, context, &mut visited, 0);
+            score += get_trail_score(*trail_head, &context.grid, 0, &mut Some(HashSet::new()));
         }
         return score;
     }
@@ -125,7 +109,7 @@ impl Day for Day10 {
     fn solve_part2(context: &Self::Context) -> Self::Part2 {
         let mut score = 0;
         for trail_head in &context.trail_heads {
-            score += get_trail_score_2(*trail_head, context, 0);
+            score += get_trail_score(*trail_head, &context.grid, 0, &mut None);
         }
         return score;
     }

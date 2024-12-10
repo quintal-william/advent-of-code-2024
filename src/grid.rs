@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::point::Point;
 
 pub struct Grid<T> {
@@ -9,7 +11,7 @@ impl<T> Grid<T> {
     pub fn from_vec(content: Vec<T>, width: usize) -> Self {
         Self { content, width }
     }
-    pub fn get<U>(&self, p: &Point<usize>) -> &T {
+    pub fn get(&self, p: &Point<usize>) -> &T {
         &self.content[p.x + p.y * self.width]
     }
     pub fn get_mut(&mut self, loc: &Point<usize>) -> &mut T {
@@ -22,3 +24,7 @@ impl<T> Grid<T> {
         self.content.len() / self.width
     }
 }
+
+// impl<T> Display for Grid<T> {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {}
+// }
