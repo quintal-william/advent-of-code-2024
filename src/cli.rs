@@ -41,14 +41,21 @@ enum Commands {
         year: YearValue,
     },
 
+    Bench {
+        #[arg(short, long, value_parser = year(), default_value = DEFAULT_YEAR)]
+        year: YearValue,
+        #[arg(short, long, value_parser = day())]
+        day: DayValue,
+        #[arg(short, long)]
+        example: bool,
+    },
+
     /// Adds a new empty Advent of Code solution
     Add {
         #[arg(short, long, value_parser = year(), default_value = DEFAULT_YEAR)]
         year: YearValue,
         #[arg(short, long, value_parser = day())]
         day: DayValue,
-        #[arg(short, long)]
-        title: String,
     },
 }
 
@@ -159,7 +166,11 @@ fn all(year: YearValue) {
     report_duration(duration);
 }
 
-fn add(_year: YearValue, _day: DayValue, _title: String) {
+fn bench(_year: YearValue, _day: DayValue, _example: bool) {
+    unimplemented!();
+}
+
+fn add(_year: YearValue, _day: DayValue) {
     unimplemented!();
 }
 
@@ -173,8 +184,11 @@ pub fn start() {
         Commands::All { year } => {
             all(year);
         }
-        Commands::Add { year, day, title } => {
-            add(year, day, title);
+        Commands::Bench { year, day, example } => {
+            bench(year, day, example);
+        }
+        Commands::Add { year, day } => {
+            add(year, day);
         }
     }
 }
