@@ -15,6 +15,7 @@ pub mod day09;
 pub mod day10;
 pub mod day11;
 pub mod day12;
+pub mod day13;
 
 pub struct Year2024;
 
@@ -33,6 +34,7 @@ impl Year for Year2024 {
             10 => Some(day10::Day10::solve(year, day, input_type)),
             11 => Some(day11::Day11::solve(year, day, input_type)),
             12 => Some(day12::Day12::solve(year, day, input_type)),
+            13 => Some(day13::Day13::solve(year, day, input_type)),
             _ => None,
         }
     }

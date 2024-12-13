@@ -19,6 +19,13 @@ pub struct DayOutput {
     pub part2: PartOutput,
 }
 
+pub struct FullDayOutput {
+    pub part1: PartOutput,
+    pub part1_example: PartOutput,
+    pub part2: PartOutput,
+    pub part2_example: PartOutput,
+}
+
 #[derive(PartialEq)]
 pub enum InputType {
     Example,
@@ -46,39 +53,36 @@ pub trait Day {
         return input;
     }
 
+    fn create_part_output<T: Display>(value: &T, expected: Option<&T>) -> PartOutput {
+        PartOutput {
+            value: value.to_string(),
+            is_correct: expected.map(|expected| value.to_string() == expected.to_string()),
+        }
+    }
+
     fn solve(year: YearValue, day: DayValue, input_type: InputType) -> DayOutput {
         let ref input = Self::get_input(year, day, &input_type);
         let ref context = Self::create_context(input);
         let solutions = Self::solutions();
+
         let part1 = Self::solve_part1(context);
+        let part1_output = if input_type == InputType::Example {
+            Self::create_part_output(&part1, solutions.part1_example.as_ref())
+        } else {
+            Self::create_part_output(&part1, solutions.part1.as_ref())
+        };
+
         let part2 = Self::solve_part2(context);
+        let part2_output = if input_type == InputType::Example {
+            Self::create_part_output(&part2, solutions.part2_example.as_ref())
+        } else {
+            Self::create_part_output(&part2, solutions.part2.as_ref())
+        };
 
         DayOutput {
             title: Self::title(),
-            part1: PartOutput {
-                value: part1.to_string(),
-                is_correct: if input_type == InputType::Example {
-                    solutions
-                        .part1_example
-                        .map(|expected| part1.to_string() == expected.to_string())
-                } else {
-                    solutions
-                        .part1
-                        .map(|expected| part1.to_string() == expected.to_string())
-                },
-            },
-            part2: PartOutput {
-                value: part2.to_string(),
-                is_correct: if input_type == InputType::Example {
-                    solutions
-                        .part2_example
-                        .map(|expected| part2.to_string() == expected.to_string())
-                } else {
-                    solutions
-                        .part2
-                        .map(|expected| part2.to_string() == expected.to_string())
-                },
-            },
+            part1: part1_output,
+            part2: part2_output,
         }
     }
 }
@@ -86,16 +90,19 @@ pub trait Day {
 pub trait Year {
     fn solve_day(year: YearValue, day: DayValue, input_type: InputType) -> Option<DayOutput>;
 
-    fn solve_all(year: YearValue) -> [Option<(DayOutput, DayOutput)>; 25] {
-        let mut solutions_array: [Option<(DayOutput, DayOutput)>; 25] = Default::default();
-        for day in 1..=25 {
-            let example = Self::solve_day(year, day as DayValue, InputType::Example);
-            let puzzle = Self::solve_day(year, day as DayValue, InputType::Puzzle);
-            solutions_array[day - 1] = match (example, puzzle) {
-                (Some(a), Some(b)) => Some((a, b)),
+    fn solve_all(year: YearValue) -> impl Iterator<Item = Option<FullDayOutput>> {
+        (1..=25).map(move |day| {
+            let example = Self::solve_day(year, day, InputType::Example);
+            let puzzle = Self::solve_day(year, day, InputType::Puzzle);
+            return match (example, puzzle) {
+                (Some(a), Some(b)) => Some(FullDayOutput {
+                    part1: a.part1,
+                    part1_example: b.part1,
+                    part2: a.part2,
+                    part2_example: b.part2,
+                }),
                 _ => None,
             };
-        }
-        return solutions_array;
+        })
     }
 }

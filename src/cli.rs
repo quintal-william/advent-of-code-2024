@@ -1,10 +1,10 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-
-use clap::{builder, value_parser, Parser, Subcommand};
-use cli_colors::Colorizer;
-
+use crate::point::Point;
 use crate::solution::{InputType, Year};
 use crate::year2024::Year2024;
+use clap::{builder, value_parser, Parser, Subcommand};
+use console::{style, StyledObject, Term};
+use std::io::Write;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub type YearValue = u16;
 const DEFAULT_YEAR: &str = "2024";
@@ -66,11 +66,10 @@ fn report_duration(duration: Duration) {
     println!("Execution time: {}.{}{} seconds", secs, millis, micros);
 }
 
-fn get_icon(is_correct: Option<bool>) -> String {
-    let colorizer = Colorizer::new();
-    let error_icon = colorizer.bold(colorizer.bright_red("x"));
-    let success_icon = colorizer.bold(colorizer.bright_green("✓"));
-    let unknown_icon = colorizer.bold(colorizer.white("?"));
+fn get_icon(is_correct: Option<bool>) -> StyledObject<String> {
+    let error_icon = style(String::from("x")).bold().red();
+    let success_icon = style(String::from("✓")).bold().green();
+    let unknown_icon = style(String::from("?")).bold().dim();
 
     is_correct.map_or(unknown_icon, |is_correct| {
         if is_correct {
@@ -89,6 +88,7 @@ fn run(year: YearValue, day: DayValue, example: bool) {
     };
 
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    // TODO do this in an iterator and draw to console incrementally
     let day_output = match year {
         2024 => Year2024::solve_day(year, day, input_type),
         _ => panic!("Year {year} not found."),
@@ -112,58 +112,91 @@ fn run(year: YearValue, day: DayValue, example: bool) {
 }
 
 fn all(year: YearValue) {
-    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let solutions_list = match year {
+    let term = &mut Term::stdout();
+    let solutions = match year {
         2024 => Year2024::solve_all(year),
         _ => panic!("Year {year} not found."),
     };
-    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let duration = end - start;
 
-    for y in 0..5 {
-        if y == 0 {
-            println!("+-=-AoC {year}: All solutions-=-+");
-            println!("+-----------------------------+");
-        }
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
 
-        for x in 0..5 {
-            if x == 0 {
-                print!("|");
-            }
-            let s = &solutions_list[y * 5 + x];
-            print!("{}", format!("{:0>2} ", y * 5 + x + 1));
-            if s.is_none() {
-                let colorizer = Colorizer::new();
-                let missing_icon = colorizer.bold(colorizer.white("-"));
-                print!("{missing_icon}{missing_icon}|")
-            } else {
-                print!("{}", get_icon(s.as_ref().unwrap().0.part1.is_correct));
-                print!("{}", get_icon(s.as_ref().unwrap().0.part2.is_correct));
-                print!("|");
-            }
-        }
-        println!();
-        for x in 0..5 {
-            if x == 0 {
-                print!("|");
-            }
-            let s = &solutions_list[y * 5 + x];
-            print!("   ");
-            if s.is_none() {
-                let colorizer = Colorizer::new();
-                let missing_icon = colorizer.bold(colorizer.white("-"));
-                print!("{missing_icon}{missing_icon}|")
-            } else {
-                print!("{}", get_icon(s.as_ref().unwrap().1.part1.is_correct));
-                print!("{}", get_icon(s.as_ref().unwrap().1.part2.is_correct));
-                print!("|");
-            }
-        }
-        println!();
-        println!("+-----------------------------+");
+    const CELL_HEIGHT: isize = 3;
+    const CELL_WIDTH: isize = 6;
+    const CALENDAR_CELLS_SIZE: isize = 5;
+    const CALENDAR_PIXEL_HEIGHT: isize = CALENDAR_CELLS_SIZE * CELL_HEIGHT + 1;
+    const CALENDAR_PIXEL_WIDTH: isize = CALENDAR_CELLS_SIZE * CELL_WIDTH + 1;
+
+    fn write(term: &mut Term, s: &str) {
+        term.write(s.as_bytes()).unwrap();
     }
 
-    report_duration(duration);
+    fn move_cursor(term: &mut Term, p: Point<isize>) {
+        if p.x > 0 {
+            term.move_cursor_right(p.x as usize).unwrap();
+        } else if p.x < 0 {
+            term.move_cursor_left(p.x.abs() as usize).unwrap();
+        }
+        if p.y > 0 {
+            term.move_cursor_down(p.y as usize).unwrap();
+        } else if p.y < 0 {
+            term.move_cursor_up(p.y.abs() as usize).unwrap();
+        }
+    }
+
+    for (day, solution) in solutions.enumerate() {
+        if day == 0 {
+            write(term, &"\n".repeat(CALENDAR_PIXEL_HEIGHT as usize + 1));
+            move_cursor(term, Point::new(0, -1 * CALENDAR_PIXEL_HEIGHT - 1));
+            write(term, &format!("+-=-AoC {year}: All solutions-=-+\n"));
+        }
+
+        write(term, "+-----+");
+        move_cursor(term, Point::new(-1 * (CELL_WIDTH + 1), 1));
+
+        let example_icons = solution.as_ref().map_or_else(
+            || {
+                let missing_icon = style("-").bold().dim();
+                return format!("{missing_icon}{missing_icon}");
+            },
+            |output| {
+                let part1_icon = get_icon(output.part1_example.is_correct);
+                let part2_icon = get_icon(output.part2_example.is_correct);
+                return format!("{part1_icon}{part2_icon}");
+            },
+        );
+
+        write(term, &format!("|{:0>2} {example_icons}|", day + 1));
+        move_cursor(term, Point::new(-1 * (CELL_WIDTH + 1), 1));
+
+        let puzzle_icons = solution.as_ref().map_or_else(
+            || {
+                let missing_icon = style("-").bold().dim();
+                return format!("{missing_icon}{missing_icon}");
+            },
+            |output| {
+                let part1_icon = get_icon(output.part1.is_correct);
+                let part2_icon = get_icon(output.part2.is_correct);
+                return format!("{part1_icon}{part2_icon}");
+            },
+        );
+
+        write(term, &format!("|   {puzzle_icons}|"));
+        move_cursor(term, Point::new(-1 * (CELL_WIDTH + 1), 1));
+        write(term, "+-----+");
+
+        if day % 5 == 4 {
+            move_cursor(term, Point::new(-1 * CALENDAR_PIXEL_WIDTH, 0));
+        } else {
+            move_cursor(term, Point::new(-1, -1 * CELL_HEIGHT));
+        }
+
+        if day == 24 {
+            move_cursor(term, Point::new(0, 1));
+        }
+    }
+
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    report_duration(end - start);
 }
 
 fn bench(_year: YearValue, _day: DayValue, _example: bool) {
