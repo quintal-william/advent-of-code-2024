@@ -4,7 +4,7 @@ use std::{
     vec,
 };
 
-use crate::solution::{Day, Solutions};
+use crate::day::{Day, Solutions};
 
 pub struct Day08;
 

@@ -1,4 +1,4 @@
-use crate::solution::{Day, Solutions};
+use crate::day::{Day, Solutions};
 
 pub struct Day09;
 

@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
 use crate::{
+    day::{Day, Solutions},
     dir::Dir,
     grid::Grid,
     point::Point,
-    solution::{Day, Solutions},
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]

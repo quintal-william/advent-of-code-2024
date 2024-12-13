@@ -1,19 +1,22 @@
-use crate::point::Point;
-use crate::solution::{InputType, Year};
-use crate::year2024::Year2024;
+use crate::year::Year;
+use crate::year2024;
+use crate::{day::DayValue, point::Point, year::YearValue};
 use clap::{builder, value_parser, Parser, Subcommand};
 use console::{style, StyledObject, Term};
 use std::io::Write;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-pub type YearValue = u16;
+pub enum InputType {
+    Example,
+    Puzzle,
+}
+
 const DEFAULT_YEAR: &str = "2024";
-fn year() -> builder::RangedI64ValueParser<YearValue> {
+fn validate_year() -> builder::RangedI64ValueParser<YearValue> {
     return value_parser!(YearValue).range(2024..2025);
 }
 
-pub type DayValue = u8;
-fn day() -> builder::RangedI64ValueParser<DayValue> {
+fn validate_day() -> builder::RangedI64ValueParser<DayValue> {
     return value_parser!(DayValue).range(1..26);
 }
 
@@ -27,9 +30,9 @@ struct Cli {
 enum Commands {
     /// Runs one Advent of Code solution
     Run {
-        #[arg(short, long, value_parser = year(), default_value = DEFAULT_YEAR)]
+        #[arg(short, long, value_parser = validate_year(), default_value = DEFAULT_YEAR)]
         year: YearValue,
-        #[arg(short, long, value_parser = day())]
+        #[arg(short, long, value_parser = validate_day())]
         day: DayValue,
         #[arg(short, long)]
         example: bool,
@@ -37,14 +40,14 @@ enum Commands {
 
     /// Runs all available Advent of Code solutions
     All {
-        #[arg(short, long, value_parser = year(), default_value = DEFAULT_YEAR)]
+        #[arg(short, long, value_parser = validate_year(), default_value = DEFAULT_YEAR)]
         year: YearValue,
     },
 
     Bench {
-        #[arg(short, long, value_parser = year(), default_value = DEFAULT_YEAR)]
+        #[arg(short, long, value_parser = validate_year(), default_value = DEFAULT_YEAR)]
         year: YearValue,
-        #[arg(short, long, value_parser = day())]
+        #[arg(short, long, value_parser = validate_day())]
         day: DayValue,
         #[arg(short, long)]
         example: bool,
@@ -52,9 +55,9 @@ enum Commands {
 
     /// Adds a new empty Advent of Code solution
     Add {
-        #[arg(short, long, value_parser = year(), default_value = DEFAULT_YEAR)]
+        #[arg(short, long, value_parser = validate_year(), default_value = DEFAULT_YEAR)]
         year: YearValue,
-        #[arg(short, long, value_parser = day())]
+        #[arg(short, long, value_parser = validate_day())]
         day: DayValue,
     },
 }
@@ -90,7 +93,7 @@ fn run(year: YearValue, day: DayValue, example: bool) {
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     // TODO do this in an iterator and draw to console incrementally
     let day_output = match year {
-        2024 => Year2024::solve_day(year, day, input_type),
+        2024 => year2024::Year2024::solve_day(year, day, input_type),
         _ => panic!("Year {year} not found."),
     }
     .expect(&format!("Day {day} not found for year {year}."));
@@ -114,7 +117,7 @@ fn run(year: YearValue, day: DayValue, example: bool) {
 fn all(year: YearValue) {
     let term = &mut Term::stdout();
     let solutions = match year {
-        2024 => Year2024::solve_all(year),
+        2024 => year2024::Year2024::solve_all(year),
         _ => panic!("Year {year} not found."),
     };
 

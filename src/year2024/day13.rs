@@ -1,8 +1,8 @@
 use regex::Regex;
 
 use crate::{
+    day::{Day, Solutions},
     point::Point,
-    solution::{Day, Solutions},
 };
 
 pub struct Day13;

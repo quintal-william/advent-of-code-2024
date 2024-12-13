@@ -1,8 +1,9 @@
 mod cli;
+mod day;
 mod dir;
 mod grid;
 mod point;
-mod solution;
+mod year;
 
 mod year2024;
 

@@ -1,6 +1,7 @@
 use crate::{
-    cli::{DayValue, YearValue},
-    solution::{Day, DayOutput, InputType, Year},
+    cli::InputType,
+    day::{Day, DayOutput, DayValue},
+    year::{Year, YearValue},
 };
 
 pub mod day01;
@@ -16,6 +17,7 @@ pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
+pub mod day14;
 
 pub struct Year2024;
 
@@ -35,6 +37,7 @@ impl Year for Year2024 {
             11 => Some(day11::Day11::solve(year, day, input_type)),
             12 => Some(day12::Day12::solve(year, day, input_type)),
             13 => Some(day13::Day13::solve(year, day, input_type)),
+            14 => Some(day14::Day14::solve(year, day, input_type)),
             _ => None,
         }
     }

@@ -1,10 +1,10 @@
 use std::{collections::HashSet, vec};
 
 use crate::{
+    day::{Day, Solutions},
     dir::Dir,
     grid::Grid,
     point::Point,
-    solution::{Day, Solutions},
 };
 
 pub struct Day10;

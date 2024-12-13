@@ -1,22 +1,22 @@
 use crate::day::{Day, Solutions};
 
-pub struct Day05;
+pub struct Day14;
 
-impl Day for Day05 {
+impl Day for Day14 {
     type Context = ();
     type Part1 = i32;
     type Part2 = i32;
 
     fn title() -> String {
-        String::from("Print Queue")
+        String::from("Title")
     }
 
     fn solutions() -> Solutions<Self::Part1, Self::Part2> {
         Solutions {
-            part1_example: Some(143),
-            part1: Some(4185),
-            part2_example: Some(123),
-            part2: Some(4480),
+            part1_example: None,
+            part1: None,
+            part2_example: None,
+            part2: None,
         }
     }
 
