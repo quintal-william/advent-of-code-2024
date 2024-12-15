@@ -1,14 +1,14 @@
 use crate::day::{Day, Solutions};
 
-pub struct Day14;
+pub struct Day15;
 
-impl Day for Day14 {
+impl Day for Day15 {
     type Context = ();
     type Part1 = i32;
     type Part2 = i32;
 
     fn title() -> String {
-        String::from("Restroom Redoubt")
+        String::from("Warehouse Woes")
     }
 
     fn solutions() -> Solutions<Self::Part1, Self::Part2> {
