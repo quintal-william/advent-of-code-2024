@@ -13,10 +13,10 @@ impl Day for Day15 {
 
     fn solutions() -> Solutions<Self::Part1, Self::Part2> {
         Solutions {
-            part1_example: None,
-            part1: None,
-            part2_example: None,
-            part2: None,
+            part1_example: Some(10092),
+            part1: Some(1475249),
+            part2_example: Some(9021),
+            part2: Some(1509724),
         }
     }
 
