@@ -3,9 +3,11 @@ use crate::year2024;
 use crate::{day::DayValue, point::Point, year::YearValue};
 use clap::{builder, value_parser, Parser, Subcommand};
 use console::{style, StyledObject, Term};
+use indicatif::ProgressIterator;
 use std::io::Write;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+#[derive(Clone)]
 pub enum InputType {
     Example,
     Puzzle,
@@ -51,6 +53,8 @@ enum Commands {
         day: DayValue,
         #[arg(short, long)]
         example: bool,
+        #[arg(short, long, value_parser = value_parser!(u32).range(1..))]
+        iterations: u32
     },
 
     /// Adds a new empty Advent of Code solution
@@ -60,13 +64,6 @@ enum Commands {
         #[arg(short, long, value_parser = validate_day())]
         day: DayValue,
     },
-}
-
-fn report_duration(duration: Duration) {
-    let secs = duration.as_secs();
-    let millis = duration.subsec_millis();
-    let micros = duration.subsec_micros() % 1_000;
-    println!("Execution time: {}.{}{} seconds", secs, millis, micros);
 }
 
 fn get_icon(is_correct: Option<bool>) -> StyledObject<String> {
@@ -111,7 +108,7 @@ fn run(year: YearValue, day: DayValue, example: bool) {
         get_icon(day_output.part2.is_correct),
         day_output.part2.value
     );
-    report_duration(duration);
+    println!("Execution time: {:?}", duration);
 }
 
 fn all(year: YearValue) {
@@ -199,11 +196,30 @@ fn all(year: YearValue) {
     }
 
     let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    report_duration(end - start);
+    println!("Total execution time: {:?}", end - start);
 }
 
-fn bench(_year: YearValue, _day: DayValue, _example: bool) {
-    unimplemented!();
+fn bench(year: YearValue, day: DayValue, example: bool, iterations: u32) {
+    run(year, day, example);
+    
+    let input_type = if example {
+        InputType::Example
+    } else {
+        InputType::Puzzle
+    };
+
+    let mut moving_mean = 0.0;
+    for i in (0..iterations).progress() {
+        let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+        match year {
+            2024 => year2024::Year2024::solve_day(year, day, input_type.clone()),
+            _ => panic!("Year {year} not found."),
+        }
+        .expect(&format!("Day {day} not found for year {year}."));
+        let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+        moving_mean += ((end - start).as_nanos() as f64 - moving_mean) / ((i as f64) + 1.0);
+    }
+    println!("Mean execution time: {:?}", Duration::from_nanos(moving_mean as u64));
 }
 
 fn add(_year: YearValue, _day: DayValue) {
@@ -220,8 +236,8 @@ pub fn start() {
         Commands::All { year } => {
             all(year);
         }
-        Commands::Bench { year, day, example } => {
-            bench(year, day, example);
+        Commands::Bench { year, day, example, iterations } => {
+            bench(year, day, example, iterations);
         }
         Commands::Add { year, day } => {
             add(year, day);
